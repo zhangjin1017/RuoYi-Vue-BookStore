@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bookstore.test.mapper.BookTestMapper">
+
+    <resultMap type="BookTest" id="BookTestResult">
+        <result property="id"    column="id"    />
+        <result property="bookName"    column="book_name"    />
+        <result property="bookStatus"    column="book_status"    />
+    </resultMap>
+
+    <sql id="selectBookTestVo">
+        select id, book_name, book_status from book_test
+    </sql>
+
+    <select id="selectBookTestList" parameterType="BookTest" resultMap="BookTestResult">
+        <include refid="selectBookTestVo"/>
+        <where>
+            <if test="bookName != null  and bookName != ''"> and book_name like concat('%', #{bookName}, '%')</if>
+        </where>
+    </select>
+
+    <select id="selectBookTestById" parameterType="Long" resultMap="BookTestResult">
+        <include refid="selectBookTestVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertBookTest" parameterType="BookTest" useGeneratedKeys="true" keyProperty="id">
+        insert into book_test
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bookName != null">book_name,</if>
+            <if test="bookStatus != null">book_status,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="bookName != null">#{bookName},</if>
+            <if test="bookStatus != null">#{bookStatus},</if>
+        </trim>
+    </insert>
+
+    <update id="updateBookTest" parameterType="BookTest">
+        update book_test
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="bookName != null">book_name = #{bookName},</if>
+            <if test="bookStatus != null">book_status = #{bookStatus},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteBookTestById" parameterType="Long">
+        delete from book_test where id = #{id}
+    </delete>
+
+    <delete id="deleteBookTestByIds" parameterType="String">
+        delete from book_test where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

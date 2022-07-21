@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bookstore.cart.mapper.BookCartMapper">
+    
+    <resultMap type="BookCart" id="BookCartResult">
+        <result property="id"    column="id"    />
+        <result property="bookId"    column="book_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="count"    column="count"    />
+        <result property="price"    column="price"    />
+        <result property="addTime"    column="add_time"    />
+    </resultMap>
+
+    <sql id="selectBookCartVo">
+        select id, book_id, user_id, count, price, add_time from book_cart
+    </sql>
+
+    <select id="selectBookCartList" parameterType="BookCart" resultMap="BookCartResult">
+        <include refid="selectBookCartVo"/>
+        <where>  
+            <if test="bookId != null "> and book_id = #{bookId}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="params.beginAddTime != null and params.beginAddTime != '' and params.endAddTime != null and params.endAddTime != ''"> and add_time between #{params.beginAddTime} and #{params.endAddTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectBookCartById" parameterType="Long" resultMap="BookCartResult">
+        <include refid="selectBookCartVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertBookCart" parameterType="BookCart" useGeneratedKeys="true" keyProperty="id">
+        insert into book_cart
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bookId != null">book_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="count != null">count,</if>
+            <if test="price != null">price,</if>
+            <if test="addTime != null">add_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="bookId != null">#{bookId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="count != null">#{count},</if>
+            <if test="price != null">#{price},</if>
+            <if test="addTime != null">#{addTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateBookCart" parameterType="BookCart">
+        update book_cart
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="bookId != null">book_id = #{bookId},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="count != null">count = #{count},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="addTime != null">add_time = #{addTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteBookCartById" parameterType="Long">
+        delete from book_cart where id = #{id}
+    </delete>
+
+    <delete id="deleteBookCartByIds" parameterType="String">
+        delete from book_cart where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

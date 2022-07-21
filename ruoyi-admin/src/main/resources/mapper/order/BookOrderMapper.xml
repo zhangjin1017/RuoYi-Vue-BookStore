@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bookstore.order.mapper.BookOrderMapper">
+
+    <resultMap type="BookOrder" id="BookOrderResult">
+        <result property="id"    column="id"    />
+        <result property="bookId"    column="book_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="count"    column="count"    />
+        <result property="price"    column="price"    />
+        <result property="payTime"    column="pay_time"    />
+    </resultMap>
+
+    <sql id="selectBookOrderVo">
+        select id, book_id, user_id, count, price, pay_time from book_order
+    </sql>
+
+    <select id="selectBookOrderList" parameterType="BookOrder" resultMap="BookOrderResult">
+        <include refid="selectBookOrderVo"/>
+        <where>
+            <if test="bookId != null  and bookId != ''"> and book_id like concat('%', #{bookId}, '%')</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="params.beginPayTime != null and params.beginPayTime != '' and params.endPayTime != null and params.endPayTime != ''"> and pay_time between #{params.beginPayTime} and #{params.endPayTime}</if>
+        </where>
+    </select>
+
+    <select id="selectBookOrderById" parameterType="Long" resultMap="BookOrderResult">
+        <include refid="selectBookOrderVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertBookOrder" parameterType="BookOrder" useGeneratedKeys="true" keyProperty="id">
+        insert into book_order
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bookId != null">book_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="count != null">count,</if>
+            <if test="price != null">price,</if>
+            <if test="payTime != null">pay_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="bookId != null">#{bookId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="count != null">#{count},</if>
+            <if test="price != null">#{price},</if>
+            <if test="payTime != null">#{payTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateBookOrder" parameterType="BookOrder">
+        update book_order
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="bookId != null">book_id = #{bookId},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="count != null">count = #{count},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="payTime != null">pay_time = #{payTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteBookOrderById" parameterType="Long">
+        delete from book_order where id = #{id}
+    </delete>
+
+    <delete id="deleteBookOrderByIds" parameterType="String">
+        delete from book_order where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
